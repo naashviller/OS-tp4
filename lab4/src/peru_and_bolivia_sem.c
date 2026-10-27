@@ -11,12 +11,10 @@ pthread_mutex_t count_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void enter_shared_track(void) {
   sem_wait(&count_m);
-  // pthread_mutex_lock(&count_mutex);
 }
 
 void exit_shared_track(void) {
   sem_post(&count_m);
-  // pthread_mutex_unlock(&count_mutex);
 }
 
 void using_shared_track_section(char *name) {

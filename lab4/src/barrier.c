@@ -4,10 +4,23 @@
 #include <pthread.h>
 
 #define NB_THREADS 16
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+int count = 0;
+//pthread_barrier_t barrier1;
 
 void barrier(void)
 {
-    /* TODO */
+    pthread_mutex_lock(&mutex);
+    count++;
+    while(count < NB_THREADS){
+       pthread_cond_wait(&cond, &mutex);
+    }
+    if(count == NB_THREADS){
+        pthread_cond_broadcast(&cond);
+    }
+    pthread_mutex_unlock(&mutex);
+    //pthread_barrier_wait(&barrier1);
 }
 
 
@@ -19,7 +32,6 @@ void* thread_routine(void* arg)
     printf("thread %lu at the barrier\n", id);
 
     barrier();
-    
     printf("\t thread %lu after the barrier\n", id);
 
     return NULL;
@@ -30,6 +42,7 @@ int main(void)
 {
     pthread_t tids[NB_THREADS];
     unsigned long i=0;
+    //pthread_barrier_init(&barrier1, NULL, NB_THREADS);
 
     for(i=0; i<NB_THREADS; i++){
         if(pthread_create (&tids[i], NULL, thread_routine, (void*)i) != 0){
